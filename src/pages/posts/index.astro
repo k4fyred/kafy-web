@@ -1,0 +1,81 @@
+---
+import { getCollection, render } from "astro:content";
+import { PostKind } from "@/types/enums";
+import { SITE_TITLE, SITE_DESCRIPTION } from "@/consts";
+
+import BaseHead from "@/components/BaseHead.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import FormattedDate from "@/components/FormattedDate.astro";
+
+const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.createdDate.valueOf() - a.data.createdDate.valueOf(),
+);
+
+const entries = await Promise.all(
+    posts.map(async (post) => {
+        const { Content } = await render(post);
+        return { post, Content };
+    }),
+);
+---
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+</head>
+
+<body>
+    <Header />
+
+    <main id="main">
+        <h1>Posts</h1>
+
+        {
+            entries.map(({ post, Content }, i) => (
+                <>
+                    <article data-kind={post.data.kind}>
+                        <header>
+                            <FormattedDate date={post.data.createdDate} />
+                            {post.data.tags.length > 0 && (
+                                <nav class="tags">
+                                    {post.data.tags.map((tag) => (
+                                        <a href={`/tags/${tag}/`}>#{tag}</a>
+                                    ))}
+                                </nav>
+                            )}
+                        </header>
+
+                        {post.data.title ||
+                        post.data.kind === PostKind.Long ? (
+                            <h2>
+                                <a href={`/posts/${post.id}/`}>
+                                    {post.data.title || post.id}
+                                </a>
+                            </h2>
+                        ) : (
+                            <a
+                                href={`/posts/${post.id}/`}
+                                class="post-permalink"
+                            >
+                                Permalink
+                            </a>
+                        )}
+
+                        <div class="post-body truncated-body">
+                            <Content />
+                        </div>
+                    </article>
+
+                    {i < entries.length - 1 && <hr />}
+                </>
+            ))
+        }
+    </main>
+
+    <Footer />
+</body>
+
+</html>

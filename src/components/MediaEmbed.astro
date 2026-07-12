@@ -1,0 +1,68 @@
+---
+import { MediaKind } from "@/types/enums";
+import { MEDIA_BASE_URL } from "@/consts";
+
+interface Props {
+    src: string;
+    kind?: MediaKind;
+    alt?: string;
+    caption?: string;
+    width?: number;
+    height?: number;
+}
+
+const mediaBase = MEDIA_BASE_URL;
+const {
+    src,
+    kind = MediaKind.Image,
+    alt = "",
+    caption,
+    width,
+    height,
+} = Astro.props;
+
+const resolvedSrc = src.startsWith("http") ? src : `${mediaBase}/${src}`;
+---
+
+<figure class="media-embed">
+    {
+        kind === MediaKind.Image && (
+            <img
+                src={resolvedSrc}
+                alt={alt}
+                width={width}
+                height={height}
+                loading="lazy"
+                decoding="async"
+            />
+        )
+    }
+    {
+        kind === MediaKind.Video && (
+            <video
+                src={resolvedSrc}
+                controls
+                preload="metadata"
+                width={width}
+                height={height}
+            >
+                <p>
+                    Your browser does not support the video element.
+                    <a href={resolvedSrc}>Download the video</a>.
+                </p>
+            </video>
+        )
+    }
+    {
+        kind === MediaKind.Audio && (
+            <audio src={resolvedSrc} controls preload="metadata">
+                <p>
+                    Your browser does not support the audio element.
+                    <a href={resolvedSrc}>Download the audio</a>.
+                </p>
+            </audio>
+        )
+    }
+
+    {caption && <figcaption>{caption}</figcaption>}
+</figure>

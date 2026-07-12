@@ -1,4 +1,14 @@
 ---
+import { SITE_TITLE } from "@/consts";
+
+import "@/styles/global.css";
+
+import "@fontsource/iosevka-charon/300.css";
+import "@fontsource/iosevka-charon/400.css";
+import "@fontsource/iosevka-charon/400-italic.css";
+import "@fontsource/iosevka-charon/700.css";
+import "@fontsource/iosevka-charon-mono/400.css";
+
 interface Props {
     title: string;
     description: string;
@@ -10,6 +20,17 @@ const { title, description } = Astro.props;
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<meta name="color-scheme" content="dark" />
+<meta name="theme-color" content="#0c0c0e" />
+
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link
+    rel="alternate"
+    type="application/rss+xml"
+    title={SITE_TITLE}
+    href={new URL("rss.xml", Astro.site)}
+/>
 
 <link rel="canonical" href={canonicalUrl} />
 
